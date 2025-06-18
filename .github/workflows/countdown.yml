@@ -62,6 +62,9 @@ jobs:
               .days { font-size: 48px; font-weight: bold; }
               .label { font-size: 24px; }
               .info { color: #666; text-align: center; margin-top: 20px; }
+              .motivation { text-align: center; margin-top: 30px; }
+              .motivation img { max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px; }
+              .motivation p { font-size: 20px; font-weight: bold; color: #ff4757; }
             </style>
           </head>
           <body>
@@ -74,6 +77,10 @@ jobs:
               <p class="info">
                 Only ${{ steps.countdown.outputs.days }} days to go!
               </p>
+              <div class="motivation">
+                <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRjNjMydWRpazU2bnBydzJ6YnpoZmdhcDhweGh6MWVneHZjaDM5NyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/B0dqvPg0rFW0M/giphy.gif" alt="Motivation">
+                <p>Work harder Raul! 💪</p>
+              </div>
             </div>
           </body>
           </html>
