@@ -19,7 +19,7 @@ jobs:
       with:
         node-version: '18'
     
-    - name: Calculate days remaining
+    - name: Calculate days remaining and select gif
       id: countdown
       run: |
         TARGET_DATE="2025-09-10"
@@ -35,6 +35,31 @@ jobs:
         else
           echo "should_send=true" >> $GITHUB_OUTPUT
         fi
+        
+        # Array of gif URLs
+        GIFS=(
+          "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDhtb3ZqcnlmeTgzcjdoZWJmMWExdmFpYmo5ZjFnYm91eGtsOW5iayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/qUAf5RDOPqqhsHeFAG/giphy.gif"
+          "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDhtb3ZqcnlmeTgzcjdoZWJmMWExdmFpYmo5ZjFnYm91eGtsOW5iayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3o6Ei2yv8fqpR3nJG8/giphy.gif"
+          "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDhtb3ZqcnlmeTgzcjdoZWJmMWExdmFpYmo5ZjFnYm91eGtsOW5iayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/13QmO3rEaDTYHD30za/giphy.gif"
+          "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDhtb3ZqcnlmeTgzcjdoZWJmMWExdmFpYmo5ZjFnYm91eGtsOW5iayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3ohzAWPbp0ZyUpYTD2/giphy.gif"
+          "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDhtb3ZqcnlmeTgzcjdoZWJmMWExdmFpYmo5ZjFnYm91eGtsOW5iayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/GyDsTZxIu096VWIvuf/giphy.gif"
+          "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDhtb3ZqcnlmeTgzcjdoZWJmMWExdmFpYmo5ZjFnYm91eGtsOW5iayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3W3LJ89ofIzWKVDMBh/giphy.gif"
+          "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3eml5ZjVmZDJqbXoxb2lrZTdhYjFzdGZ3N3E2dDR2ZDV5bGlsZmY4NSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/UP8SV1pittYn7k807k/giphy.gif"
+          "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3aDdkdmRuN2UycTB6OTJmMjFobmMwcmlzOWo1b3BrenJ0M29xMWpkMyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/PLVIXXZUhI5GA0SVF2/giphy.gif"
+          "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3bGh4bWV3ZXluamF6cTVvdXA3bTR2bG9mcGY4aTM3aWVoYTA3aDFiaiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/STT3E1ebKKsAXMWEtH/giphy.gif"
+          "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3cWs2cmg1cmRlNXJpZDVucDFndHk3d2k4N2w5NWE5cnpuc3hnNjBhMiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/2Ka1801kZq3GjQwCVO/giphy.gif"
+          "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3ZnU1N2F1bW1rd24yMW5weXZxbnFhNHFwcDhtMXBnOTByeWYzdmJhMiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xT5LMSleuVuCe24KLC/giphy.gif"
+          "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3ZXI4ajZ3MzdveWFrb2JlbWJpb3BuZG95enowcWxrdXN6aDFzNnNlcCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/2Ga8aj2mbUFK8/giphy.gif"
+          "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3Z3RucHp6bnhlcDdsMDR3bjlueGp0czRxazNmdnh1djV4OHM0Ymc4NiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/rsx8QKwpSORLn974nf/giphy.gif"
+        )
+        
+        # Select gif based on days remaining modulo array length
+        ARRAY_LENGTH=${#GIFS[@]}
+        GIF_INDEX=$(( $DAYS_REMAINING % $ARRAY_LENGTH ))
+        SELECTED_GIF="${GIFS[$GIF_INDEX]}"
+        
+        echo "gif_url=$SELECTED_GIF" >> $GITHUB_OUTPUT
+        echo "Selected gif index: $GIF_INDEX"
     
     - name: Send email
       if: steps.countdown.outputs.should_send == 'true'
@@ -78,7 +103,7 @@ jobs:
                 Only ${{ steps.countdown.outputs.days }} days to go!
               </p>
               <div class="motivation">
-                <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRjNjMydWRpazU2bnBydzJ6YnpoZmdhcDhweGh6MWVneHZjaDM5NyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/B0dqvPg0rFW0M/giphy.gif" alt="Motivation">
+                <img src="${{ steps.countdown.outputs.gif_url }}" alt="Daily Motivation">
                 <p>Work harder Raul! 💪</p>
               </div>
             </div>
