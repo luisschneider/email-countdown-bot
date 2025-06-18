@@ -1,0 +1,76 @@
+name: Daily Countdown Email
+
+on:
+  schedule:
+    # Runs at 9:00 AM UTC every day
+    - cron: '0 9 * * *'
+  workflow_dispatch: # Allows manual trigger for testing
+
+jobs:
+  send-countdown-email:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Calculate days remaining
+      id: countdown
+      run: |
+        TARGET_DATE="2025-09-10"
+        CURRENT_DATE=$(date +%s)
+        TARGET_TIMESTAMP=$(date -d "$TARGET_DATE" +%s)
+        DAYS_REMAINING=$(( ($TARGET_TIMESTAMP - $CURRENT_DATE) / 86400 ))
+        echo "days=$DAYS_REMAINING" >> $GITHUB_OUTPUT
+        echo "Days remaining: $DAYS_REMAINING"
+        
+        if [ $DAYS_REMAINING -le 0 ]; then
+          echo "Target date reached!"
+          echo "should_send=false" >> $GITHUB_OUTPUT
+        else
+          echo "should_send=true" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Send email
+      if: steps.countdown.outputs.should_send == 'true'
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: 📅 ${{ steps.countdown.outputs.days }} days until September 10th, 2025!
+        to: ${{ secrets.EMAIL_TO }}
+        from: ${{ secrets.EMAIL_USERNAME }}
+        html_body: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
+              .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+              h1 { color: #333; text-align: center; }
+              .countdown { background-color: #007bff; color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0; }
+              .days { font-size: 48px; font-weight: bold; }
+              .label { font-size: 24px; }
+              .info { color: #666; text-align: center; margin-top: 20px; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>Countdown to September 10th, 2025</h1>
+              <div class="countdown">
+                <div class="days">${{ steps.countdown.outputs.days }}</div>
+                <div class="label">DAYS REMAINING</div>
+              </div>
+              <p class="info">
+                Only ${{ steps.countdown.outputs.days }} days to go!
+              </p>
+            </div>
+          </body>
+          </html>
