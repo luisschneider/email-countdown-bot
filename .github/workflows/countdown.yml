@@ -3,7 +3,7 @@ name: Daily Countdown Email
 on:
   schedule:
     # Runs at 9:00 AM UTC every day
-    - cron: '0 9 * * *'
+    - cron: '0 7 * * *'
   workflow_dispatch: # Allows manual trigger for testing
 
 jobs:
